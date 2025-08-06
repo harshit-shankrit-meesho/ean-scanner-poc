@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ericblade/quagga2": "1.8.4",
+    "@zxing/library": "0.21.3",
+    "quagga": "0.12.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-router": "^5.3.4",
+    "react-router-dom": "^5.3.4",
     "react-scripts": "3.0.1",
-    "tailwindcss": "1.8.4",
-    "@ericblade/quagga2": "1.8.4",
-    "quagga": "0.12.1",
-    "@zxing/library": "0.21.3"
+    "tailwindcss": "1.8.4"
   },
   "scripts": {
     "build:tailwind": "tailwindcss build src/tailwind.css -o src/tailwind.output.css",
