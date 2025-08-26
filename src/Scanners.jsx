@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { BrowserMultiFormatReader } from "@zxing/library";
 import Quagga from "quagga";
 import Quagga2 from "@ericblade/quagga2";
@@ -107,6 +107,20 @@ function NativeEANScanner({ onScanSuccess }) {
   const lastDetectionAttempt = useRef(0);
   const noDetectionCount = useRef(0);
 
+  const applyZoom = useCallback(async (newZoom) => {
+    if (!streamRef.current || !supportsZoom) return;
+    
+    try {
+      const videoTrack = streamRef.current.getVideoTracks()[0];
+      await videoTrack.applyConstraints({
+        advanced: [{ zoom: newZoom }]
+      });
+      setZoomLevel(newZoom);
+    } catch (err) {
+      console.warn("Failed to apply zoom:", err);
+    }
+  }, [supportsZoom]);
+
   useEffect(() => {
     if (!scanning) return;
     let stopped = false;
@@ -192,20 +206,6 @@ function NativeEANScanner({ onScanSuccess }) {
     };
   }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
 
-  const applyZoom = async (newZoom) => {
-    if (!streamRef.current || !supportsZoom) return;
-    
-    try {
-      const videoTrack = streamRef.current.getVideoTracks()[0];
-      await videoTrack.applyConstraints({
-        advanced: [{ zoom: newZoom }]
-      });
-      setZoomLevel(newZoom);
-    } catch (err) {
-      console.warn("Failed to apply zoom:", err);
-    }
-  };
-
   const handleScanAgain = () => {
     setResult("");
     setError("");
@@ -271,6 +271,20 @@ function ZxingEANScanner({ onScanSuccess }) {
   const streamRef = useRef(null);
   const lastDetectionAttempt = useRef(0);
   const noDetectionCount = useRef(0);
+
+  const applyZoom = useCallback(async (newZoom) => {
+    if (!streamRef.current || !supportsZoom) return;
+    
+    try {
+      const videoTrack = streamRef.current.getVideoTracks()[0];
+      await videoTrack.applyConstraints({
+        advanced: [{ zoom: newZoom }]
+      });
+      setZoomLevel(newZoom);
+    } catch (err) {
+      console.warn("Failed to apply zoom:", err);
+    }
+  }, [supportsZoom]);
 
   useEffect(() => {
     if (!scanning) return;
@@ -354,20 +368,6 @@ function ZxingEANScanner({ onScanSuccess }) {
       }
     };
   }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
-
-  const applyZoom = async (newZoom) => {
-    if (!streamRef.current || !supportsZoom) return;
-    
-    try {
-      const videoTrack = streamRef.current.getVideoTracks()[0];
-      await videoTrack.applyConstraints({
-        advanced: [{ zoom: newZoom }]
-      });
-      setZoomLevel(newZoom);
-    } catch (err) {
-      console.warn("Failed to apply zoom:", err);
-    }
-  };
 
   const handleScanAgain = () => {
     setResult("");
@@ -742,6 +742,27 @@ function Html5QrcodeEANScanner({ onScanSuccess }) {
   const lastDetectionAttempt = useRef(0);
   const noDetectionCount = useRef(0);
 
+  const applyZoom = useCallback(async (newZoom) => {
+    if (!scannerRef.current || !supportsZoom) return;
+    
+    try {
+      // For HTML5-QRCode, we need to access the video element directly
+      const videoElement = document.querySelector("#html5-qrcode-reader video");
+      if (videoElement && videoElement.srcObject) {
+        const stream = videoElement.srcObject;
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack) {
+          await videoTrack.applyConstraints({
+            advanced: [{ zoom: newZoom }]
+          });
+          setZoomLevel(newZoom);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to apply zoom:", err);
+    }
+  }, [supportsZoom]);
+
   useEffect(() => {
     if (!scanning) return;
     let active = true;
@@ -835,27 +856,6 @@ function Html5QrcodeEANScanner({ onScanSuccess }) {
       } catch (e) {}
     };
   }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
-
-  const applyZoom = async (newZoom) => {
-    if (!scannerRef.current || !supportsZoom) return;
-    
-    try {
-      // For HTML5-QRCode, we need to access the video element directly
-      const videoElement = document.querySelector("#html5-qrcode-reader video");
-      if (videoElement && videoElement.srcObject) {
-        const stream = videoElement.srcObject;
-        const videoTrack = stream.getVideoTracks()[0];
-        if (videoTrack) {
-          await videoTrack.applyConstraints({
-            advanced: [{ zoom: newZoom }]
-          });
-          setZoomLevel(newZoom);
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to apply zoom:", err);
-    }
-  };
 
   const handleScanAgain = () => {
     setResult("");
