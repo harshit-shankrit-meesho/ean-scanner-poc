@@ -183,12 +183,14 @@ function NativeEANScanner({ onScanSuccess }) {
         });
         streamRef.current = null;
       }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-        videoRef.current.load();
+      // Store videoRef.current in a variable to avoid ref changes during cleanup
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = null;
+        video.load();
       }
     };
-  }, [scanning, zoomLevel]);
+  }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
 
   const applyZoom = async (newZoom) => {
     if (!streamRef.current || !supportsZoom) return;
@@ -351,8 +353,7 @@ function ZxingEANScanner({ onScanSuccess }) {
         streamRef.current = null;
       }
     };
-    // eslint-disable-next-line
-  }, [scanning, zoomLevel]);
+  }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
 
   const applyZoom = async (newZoom) => {
     if (!streamRef.current || !supportsZoom) return;
@@ -522,7 +523,7 @@ function QuaggaEANScanner({ onScanSuccess }) {
         streamRef.current = null;
       }
     };
-  }, [scanning, zoomLevel]);
+  }, [scanning, zoomLevel, maxZoom, onScanSuccess, supportsZoom]);
 
   const handleScanAgain = () => {
     setResult("");
@@ -678,7 +679,7 @@ function Quagga2EANScanner({ onScanSuccess }) {
         streamRef.current = null;
       }
     };
-  }, [scanning, zoomLevel]);
+  }, [scanning, zoomLevel, maxZoom, onScanSuccess, supportsZoom]);
 
   const handleScanAgain = () => {
     setResult("");
@@ -833,7 +834,7 @@ function Html5QrcodeEANScanner({ onScanSuccess }) {
         }
       } catch (e) {}
     };
-  }, [scanning, zoomLevel]);
+  }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
 
   const applyZoom = async (newZoom) => {
     if (!scannerRef.current || !supportsZoom) return;
