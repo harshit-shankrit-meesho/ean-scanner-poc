@@ -125,6 +125,8 @@ function NativeEANScanner({ onScanSuccess }) {
     if (!scanning) return;
     let stopped = false;
     let stream;
+    // Capture videoRef.current at the beginning of the effect
+    const videoElement = videoRef.current;
 
     async function run() {
       if (!("BarcodeDetector" in window)) {
@@ -197,11 +199,10 @@ function NativeEANScanner({ onScanSuccess }) {
         });
         streamRef.current = null;
       }
-      // Store videoRef.current in a variable to avoid ref changes during cleanup
-      const video = videoRef.current;
-      if (video) {
-        video.srcObject = null;
-        video.load();
+      // Use the captured videoElement from the beginning of the effect
+      if (videoElement) {
+        videoElement.srcObject = null;
+        videoElement.load();
       }
     };
   }, [scanning, zoomLevel, applyZoom, maxZoom, onScanSuccess, supportsZoom]);
